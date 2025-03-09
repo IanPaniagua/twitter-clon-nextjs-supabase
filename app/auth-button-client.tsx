@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 
 export default function AuthButtonClient( { session }: { session: Session | null } ) {
-    const supabase = createClientComponentClient();
+    const supabase = createClientComponentClient<Database>();
     const router = useRouter();
 
     const handleSignIn = async () => {
@@ -21,7 +21,7 @@ export default function AuthButtonClient( { session }: { session: Session | null
         router.refresh();
     }
 
-  return !session ? (
+  return session ? (
     <button onClick={handleSignIn}>Login</button>
     ) : (
     <button onClick={handleSignOut}>Logout</button>
