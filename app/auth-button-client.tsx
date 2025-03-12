@@ -21,7 +21,7 @@ export default function AuthButtonClient( { session }: { session: Session | null
         router.refresh();
     }
 
-  return session ? (
+  return !session ? (
     <button onClick={handleSignIn}>Login</button>
     ) : (
     <button onClick={handleSignOut}>Logout</button>
