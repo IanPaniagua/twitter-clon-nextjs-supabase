@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import AuthButtonServer from "./auth-button-server";
 import { redirect } from "next/navigation";
 import NewTweet from "./new-tweet";
+import Likes from "./likes";
 
 export default async function Home() {
   const cookieStore = cookies();
@@ -15,13 +16,14 @@ export default async function Home() {
   }
 
   // Sin .eq(), supabase podría manejar esto si RLS y relaciones están configuradas
-  const { data: tweets, error } = await supabase
+  const { data } = await supabase
     .from("tweets")
-    .select("*, profiles(username, name, avatar_url)");
-
-  if (error) {
-    console.error("Error al obtener los tweets:", error);
-  }
+    .select("*, profiles(*), likes(*)");
+  const tweets = data?.map((tweet) => ({
+    ...tweet,
+    user_has_liked_tweet: tweet.likes.find(like => like.user_id === session.user.id),
+    likes: tweet.likes.length
+  }))?? [];
 
   return (
     <>
@@ -31,6 +33,7 @@ export default async function Home() {
         <div key={tweet.id}>
           <p>{tweet?.profiles?.username}</p>
           <p>{tweet.title}</p>
+          <Likes tweet={tweet}/>
         </div>
       ))}
     </>
